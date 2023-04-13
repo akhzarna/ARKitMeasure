@@ -1,8 +1,8 @@
 //
-//  ARViewController.swift
+//  ViewController.swift
 //  CapturedObjectViewer
 //
-//  Created by DAISUKEMAJIMA on 2022/01/17.
+//  Created by Akhzar Nazir on 2023/04/08.
 //
 
 import UIKit
@@ -14,13 +14,15 @@ class ViewController: UIViewController, ARSessionDelegate {
     var sceneView:ARSCNView!
     var trackingStateOK: Bool = false
 
-    let sphereNode = SCNNode(geometry: SCNSphere(radius: 0.01))
+    let sphereNode = SCNNode(geometry: SCNSphere(radius: 0.008))
     var tappedPointNodeOrigin: SCNNode?
     var tappedPointNodeDest: SCNNode?
     var lineNode = SCNNode()
     var objectNode: SCNNode!
     
-    var distanceLabel = UILabel()
+    var distanceLabelCM = UILabel()
+    var distanceLabelInches = UILabel()
+
     let coachingOverlayView = UIView()
     
     override func viewDidLoad() {
@@ -31,13 +33,13 @@ class ViewController: UIViewController, ARSessionDelegate {
         
         sceneView.scene.rootNode.addChildNode(lineNode)
         
-        distanceLabel.text = ""
-        distanceLabel.frame = CGRect(x: 0, y: view.bounds.maxY - 200, width: view.bounds.width, height: 200)
-        view.addSubview(distanceLabel)
-        distanceLabel.textColor = .red
-        distanceLabel.textAlignment = .center
-        distanceLabel.numberOfLines = 3
-        distanceLabel.font = .systemFont(ofSize: 40, weight: .bold)
+        distanceLabelCM.text = ""
+        distanceLabelCM.frame = CGRect(x: 0, y: view.bounds.maxY - 200, width: view.bounds.width, height: 200)
+        view.addSubview(distanceLabelCM)
+        distanceLabelCM.textColor = .green
+        distanceLabelCM.textAlignment = .center
+        distanceLabelCM.numberOfLines = 3
+        distanceLabelCM.font = .systemFont(ofSize: 40, weight: .bold)
         
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tap(recognizer:))))
         setupCoachingOverlay()
@@ -56,7 +58,7 @@ class ViewController: UIViewController, ARSessionDelegate {
         case .normal:
             coachingOverlayView.isHidden = true
             trackingStateOK = true
-            distanceLabel.text = "Displays the distance\n between the two touched points"
+            distanceLabelCM.text = "Tap on 2 points to find the distance"
         default:
             coachingOverlayView.isHidden = false
             trackingStateOK = false
@@ -96,7 +98,9 @@ class ViewController: UIViewController, ARSessionDelegate {
             sceneView.scene.rootNode.addChildNode(tappedPointNodeDest!)
             
             let distance = distance(tappedPointNodeOrigin!.simdWorldPosition, tappedPointNodeDest!.simdWorldPosition)
-            distanceLabel.text = String(floor(distance*10000)/100) + "cm"
+            distanceLabelCM.text = String(floor(distance*10000)/100) + "cm"
+            distanceLabelCM.text = String(floor(distance*10000)/100) + "cm"
+
             print(distance)
             let lineNode = lineBetweenNodes(positionA: tappedPointNodeOrigin!.worldPosition, positionB: tappedPointNodeDest!.worldPosition, inScene: sceneView.scene)
             lineNode.geometry?.materials.first?.readsFromDepthBuffer = false
